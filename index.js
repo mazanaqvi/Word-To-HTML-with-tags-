@@ -6,6 +6,7 @@ var options = {
 
         "p[style-name='title'] => title",
         "p[style-name='شاعری'] => poetry",
+        "p[style-name='Quote'] => poetry",
         "p[style-name='ہیڈنگ'] => h2",
         "p[style-name='پہلا خطبہ'] => title",
         "p[style-name='عربی آیات ٹیکسٹ'] => ayat",
@@ -13,7 +14,7 @@ var options = {
 
     ]
 }; 
-var i=80;
+var i=1;
 var nameDocx=i.toString()+'.docx';
 var nameHTML=i.toString()+'.html';
 
