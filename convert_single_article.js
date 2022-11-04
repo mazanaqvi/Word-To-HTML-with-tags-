@@ -17,7 +17,7 @@ var options = {
 
     ]
 }; 
-i = '01_154_nifaq-o-munafiqat-09';
+i = '<_name>';
         var nameDocx = i + '.docx';
         var nameHTML = i + '.html';
         // var article_name = '71_1';
