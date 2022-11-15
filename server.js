@@ -32,6 +32,9 @@ const storage = multer.diskStorage({
 //   res.send(req.file);
 // });
 var finalHtml;
+app.get("/", (req, res) => {
+  res.send("Server is Running");
+});
 app.post("/convert-to-html", (req, res) => {
   try {
     const arrayBuffer = req.files.file;
