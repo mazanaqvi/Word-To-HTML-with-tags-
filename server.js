@@ -1,43 +1,29 @@
 const express = require("express");
 const mammoth = require("mammoth");
 const cors = require("cors");
-const btoa = require("btoa");
 const fileUpload = require("express-fileupload");
-
 const fs = require("fs");
+
 const app = express();
 
-const port = 5001;
+const port = 4000;
 
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./files/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    let originalName = file.originalname;
-    let extension = originalName.split(".")[1];
-    cb(null, file.fieldname + "-" + uniqueSuffix + "." + extension);
-  },
-});
-
-//const upload = multer({ storage: storage });
-// app.route("/test").post(upload.single("file"), function (req, res) {
-//   res.send(req.file);
-// });
 var finalHtml;
 app.get("/", (req, res) => {
   res.send("Server is Running");
 });
+
 app.post("/convert-to-html", (req, res) => {
   try {
     const arrayBuffer = req.files.file;
+    if (!arrayBuffer) {
+      return res.status(400).json({ message: "bad request" });
+    }
     const options = {
       styleMap: [
         "p[style-name='title'] => title",
