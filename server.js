@@ -35,8 +35,6 @@ var finalHtml;
 app.post("/convert-to-html", (req, res) => {
   try {
     const arrayBuffer = req.files.file;
-    console.log(arrayBuffer);
-
     const options = {
       styleMap: [
         "p[style-name='title'] => title",
@@ -76,17 +74,17 @@ app.post("/convert-to-html", (req, res) => {
 
         finalHtml = finalHtml.replaceAll("<title>", '<h1 class="title">');
         finalHtml = finalHtml.replaceAll("</title>", "</h1>");
-        console.log(finalHtml);
 
         fs.writeFileSync(nameHTML, finalHtml, { encoding: "utf8", flag: "w" });
         return res.status(200).json({ message: finalHtml });
       });
   } catch (error) {
-    console.log(error.message);
     return res.status(500).json({ message: "unexpected server error" });
   }
 });
 app.get("/get-html", (req, res) => {
   res.send(finalHtml);
 });
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+app.listen(process.env.PORT || port, () =>
+  console.log(`App listening on port ${port}!`)
+);
