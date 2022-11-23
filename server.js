@@ -10,8 +10,22 @@ const port = 4000;
 
 app.use(cors());
 app.use(express.json());
-app.use(fileUpload());
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(fileUpload());
+
+// const multer = require("multer");
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "./files/");
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     let originalName = file.originalname;
+//     let extension = originalName.split(".")[1];
+//     cb(null, file.fieldname + "-" + uniqueSuffix + "." + extension);
+//   },
+// });
 
 var finalHtml;
 app.get("/", (req, res) => {
@@ -20,7 +34,10 @@ app.get("/", (req, res) => {
 
 app.post("/convert-to-html", (req, res) => {
   try {
-    const arrayBuffer = req.files.file;
+    console.log("entered.");
+    console.log(req.body);
+    const { file: arrayBuffer } = req.files;
+
     if (!arrayBuffer) {
       return res.status(400).json({ message: "bad request" });
     }
@@ -30,12 +47,22 @@ app.post("/convert-to-html", (req, res) => {
         "p[style-name='شاعری'] => poetry",
         "p[style-name='Quote'] => poetry",
 
-        "p[style-name='ہیڈنگ'] => h2",
+        "p[style-name='ہیڈنگ'] => h1",
+        "p[style-name='ayat'] => ayat",
+        "p[style-name='Subtitle'] => Subtitle",
+        "p[style-name='Heading'] => h1",
+        "p[style-name='Heading 2'] => h2",
+        "p[style-name='Heading 3'] => h3",
+        "p[style-name='Heading h4'] => h4",
+        "p[style-name='hawala'] => hawala",
         "p[style-name='پہلا خطبہ'] => title",
         "p[style-name='عربی آیات ٹیکسٹ'] => ayat",
         "p[style-name='No Spacing'] => ayat",
         "p[style-name='NoSpacing'] => ayat",
+        "p[style-name='riwayat'] => riwayat",
+        "p[style-name='urduShair'] => urduShair",
         "p[style-name='عربی آیات'] => ayat",
+        "p[style-name='farsiShair'] => farsiShair",
       ],
     };
     i = "temp";
@@ -47,10 +74,25 @@ app.post("/convert-to-html", (req, res) => {
       .then(function (result) {
         var html = result.value;
         //html='<html dir="rtl" lang="ur"><head><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head><body>'+html+'</body></html>';
-        html = html.replaceAll("<poetry>", '<h4 class="poetry">');
-        html = html.replaceAll("</poetry>", "</h4>");
+        html = html.replaceAll("<poetry>", '<p class="poetry">');
+        html = html.replaceAll("</poetry>", "<p/>");
         html = html.replaceAll("<ayat>", '<p class="ayat">');
         html = html.replaceAll("</ayat>", "</p>");
+        html = html.replaceAll("<Subtitle>", '<p class="Subtitle">');
+        html = html.replaceAll("</Subtitle>", "</p>");
+
+        html = html.replaceAll("<hawala>", '<p class="hawala">');
+        html = html.replaceAll("</hawala>", "</p>");
+
+        html = html.replaceAll("<riwayat>", '<p class="riwayat">');
+        html = html.replaceAll("</riwayat>", "</p>");
+
+        html = html.replaceAll("<urduShair>", '<p class="urduShair">');
+        html = html.replaceAll("</urduShair>", "</p>");
+
+        html = html.replaceAll("<farsiShair>", '<p class="farsiShair">');
+        html = html.replaceAll("</farsiShair>", "</p>");
+
         html = html.replaceAll(
           "ﷺ",
           " صَلَّی اللہُ عَلَیْہِ وَاٰلِہٖ وَسَلَّمْ "
@@ -68,7 +110,7 @@ app.post("/convert-to-html", (req, res) => {
         return res.status(200).json({ message: finalHtml });
       });
   } catch (error) {
-    return res.status(500).json({ message: "unexpected server error" });
+    return res.status(500).json({ message: "unexpected server error" + error });
   }
 });
 app.get("/get-html", (req, res) => {
