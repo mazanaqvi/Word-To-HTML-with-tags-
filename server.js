@@ -64,7 +64,7 @@ app.post("/convert-to-html", (req, res) => {
         "p[style-name='riwayat'] => riwayat",
         "p[style-name='urduShair'] => div.urduShair > p:fresh",
         "p[style-name='عربی آیات'] => ayat",
-        "p[style-name='farsiShair'] => div.farsiShair > p:fresh",
+        "p[style-name='farsi n arabic Shair'] => div.farsiShair > p:fresh",
       ],
     };
     i = "temp";
