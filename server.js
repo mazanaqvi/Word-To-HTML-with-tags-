@@ -82,8 +82,8 @@ app.post("/convert-to-html", (req, res) => {
         html = html.replaceAll("</title>", "<p/>");
         html = html.replaceAll("<ayat>", '<p class="ayat">');
         html = html.replaceAll("</ayat>", "</p>");
-        html = html.replaceAll("<Subtitle>", '<p class="Subtitle">');
-        html = html.replaceAll("</Subtitle>", "</p>");
+        html = html.replaceAll("<subtitle>", '<p class="subtitle">');
+        html = html.replaceAll("</subtitle>", "</p>");
 
         html = html.replaceAll("<hawala>", '<p class="hawala">');
         html = html.replaceAll("</hawala>", "</p>");
