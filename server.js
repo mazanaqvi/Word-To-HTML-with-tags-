@@ -44,25 +44,27 @@ app.post("/convert-to-html", (req, res) => {
     const options = {
       styleMap: [
         "p[style-name='title'] => title",
-        "p[style-name='شاعری'] => poetry",
+        "p[style-name='شاعری'] => div.urduShair > p:fresh",
         "p[style-name='Quote'] => poetry",
 
         "p[style-name='ہیڈنگ'] => h1",
         "p[style-name='ayat'] => ayat",
-        "p[style-name='Subtitle'] => Subtitle",
-        "p[style-name='Heading'] => h1",
-        "p[style-name='Heading 2'] => h2",
-        "p[style-name='Heading 3'] => h3",
-        "p[style-name='Heading h4'] => h4",
+        "p[style-name='Subtitle'] => subtitle",
+        "p[style-name='Heading'] => h2",
+        "p[style-name='Heading 2'] => h3",
+        "p[style-name='Heading 3'] => h4",
+        "p[style-name='Heading 4'] => h5",
+        "p[style-name='Heading 5'] => h6",
+        "p[style-name='Heading 6'] => h7",
         "p[style-name='hawala'] => hawala",
         "p[style-name='پہلا خطبہ'] => title",
         "p[style-name='عربی آیات ٹیکسٹ'] => ayat",
         "p[style-name='No Spacing'] => ayat",
         "p[style-name='NoSpacing'] => ayat",
         "p[style-name='riwayat'] => riwayat",
-        "p[style-name='urduShair'] => urduShair",
+        "p[style-name='urduShair'] => div.urduShair > p:fresh",
         "p[style-name='عربی آیات'] => ayat",
-        "p[style-name='farsiShair'] => farsiShair",
+        "p[style-name='farsiShair'] => div.farsiShair > p:fresh",
       ],
     };
     i = "temp";
@@ -87,11 +89,11 @@ app.post("/convert-to-html", (req, res) => {
         html = html.replaceAll("<riwayat>", '<p class="riwayat">');
         html = html.replaceAll("</riwayat>", "</p>");
 
-        html = html.replaceAll("<urduShair>", '<p class="urduShair">');
-        html = html.replaceAll("</urduShair>", "</p>");
+        // // html = html.replaceAll("<urduShair>", '<p class="urduShair">');
+        // // html = html.replaceAll("</urduShair>", "</p>");
 
-        html = html.replaceAll("<farsiShair>", '<p class="farsiShair">');
-        html = html.replaceAll("</farsiShair>", "</p>");
+        // html = html.replaceAll("<farsiShair>", '<p class="farsiShair">');
+        // html = html.replaceAll("</farsiShair>", "</p>");
 
         html = html.replaceAll(
           "ﷺ",
@@ -103,8 +105,8 @@ app.post("/convert-to-html", (req, res) => {
           html +
           "</body></html>";
 
-        finalHtml = finalHtml.replaceAll("<title>", '<h1 class="title">');
-        finalHtml = finalHtml.replaceAll("</title>", "</h1>");
+        // finalHtml = finalHtml.replaceAll("<title>", '<h1 class="title">');
+        // finalHtml = finalHtml.replaceAll("</title>", "</h1>");
 
         //fs.writeFileSync(nameHTML, finalHtml, { encoding: "utf8", flag: "w" });
         return res.status(200).json({ message: finalHtml });
