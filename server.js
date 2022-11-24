@@ -78,6 +78,8 @@ app.post("/convert-to-html", (req, res) => {
         //html='<html dir="rtl" lang="ur"><head><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head><body>'+html+'</body></html>';
         html = html.replaceAll("<poetry>", '<p class="poetry">');
         html = html.replaceAll("</poetry>", "<p/>");
+        html = html.replaceAll("<title>", '<p class="title">');
+        html = html.replaceAll("</title>", "<p/>");
         html = html.replaceAll("<ayat>", '<p class="ayat">');
         html = html.replaceAll("</ayat>", "</p>");
         html = html.replaceAll("<Subtitle>", '<p class="Subtitle">');
