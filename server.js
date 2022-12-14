@@ -1,42 +1,86 @@
 const express = require("express");
+const imageCompression = require("browser-image-compression");
 const mammoth = require("mammoth");
+
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+var bodyParser = require("body-parser");
 
 const app = express();
 
 const port = 4000;
 
+app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(fileUpload());
-
-// const multer = require("multer");
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./files/");
-//   },
-//   filename: function (req, file, cb) {
-//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-//     let originalName = file.originalname;
-//     let extension = originalName.split(".")[1];
-//     cb(null, file.fieldname + "-" + uniqueSuffix + "." + extension);
-//   },
-// });
+// app.use(fileUpload());
 
 var finalHtml;
 app.get("/", (req, res) => {
   res.send("Server is Running");
 });
+async function handleImageUpload(file) {
+  const imageFile = file;
 
-app.post("/convert-to-html", (req, res) => {
+  console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
+
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  };
+  try {
+    const compressedFile = await imageCompression(imageFile, options);
+    // true
+    console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`); // smaller than maxSizeMB
+
+    await uploadToServer(compressedFile); // write your own logic
+  } catch (error) {
+    console.log(error);
+  }
+}
+app.post("/compress-image", upload.single("file"), async (req, res) => {
+  try {
+    console.log("entered.");
+    const arrayBuffer = req.file;
+    console.log("arrayBuffer: ", arrayBuffer);
+
+    if (!arrayBuffer) {
+      console.log("buffer is not null");
+
+      const options = {
+        maxSizeMB: 5,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+      console.log("sasa");
+      const compressedFile = await imageCompression(arrayBuffer, options);
+      console.log("asdsad: ", compressedFile);
+      try {
+        console.log("compressing images");
+
+        // smaller than maxSizeMB
+        return res.status(200).json({ message: "finalHtml" });
+      } catch (error) {
+        console.log(error);
+      }
+      return res.status(400).json({ message: "bad request" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "unexpected server error" + error });
+  }
+  return res.status(200).json({ message: "finalHtml" });
+});
+app.post("/convert-to-html", upload.single("file"), (req, res) => {
   try {
     console.log("entered.");
     console.log(req.body);
-    const { file: arrayBuffer } = req.files;
+    const arrayBuffer = req.file;
+    console.log("arrayBuffer: ", arrayBuffer);
 
     if (!arrayBuffer) {
       return res.status(400).json({ message: "bad request" });
@@ -72,7 +116,7 @@ app.post("/convert-to-html", (req, res) => {
     var nameHTML = i + ".html";
     //Here the arrayBuffer is to be configured so that it can accept the bytes from flutter.
     var myHTML = mammoth
-      .convertToHtml({ buffer: arrayBuffer.data }, options)
+      .convertToHtml(arrayBuffer, options)
       .then(function (result) {
         var html = result.value;
         //html='<html dir="rtl" lang="ur"><head><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head><body>'+html+'</body></html>';
@@ -117,6 +161,7 @@ app.post("/convert-to-html", (req, res) => {
     return res.status(500).json({ message: "unexpected server error" + error });
   }
 });
+
 app.get("/get-html", (req, res) => {
   res.send(finalHtml);
 });
