@@ -123,9 +123,6 @@ app.post("/convert-to-html", upload.single("file"), (req, res) => {
   }
 });
 
-app.get("/get-html", (req, res) => {
-  res.send(finalHtml);
-});
 app.listen(process.env.PORT || port, () =>
   console.log(`App listening on port ${port}!`)
 );
