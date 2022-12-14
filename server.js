@@ -42,7 +42,7 @@ app.post("/compress-image", upload.single("file"), async (req, res) => {
       .jpeg({ quality: 10 })
       .toBuffer();
 
-    res.status(200).json({ message: compressedImage });
+    res.status(200).json({ imageBuffer: compressedImage });
   } catch (error) {
     return res.status(500).json({ message: "unexpected server error" + error });
   }
