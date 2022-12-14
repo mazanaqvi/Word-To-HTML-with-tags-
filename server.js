@@ -6,8 +6,11 @@ const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 var bodyParser = require("body-parser");
+
+const sharp = require("sharp");
 
 const app = express();
 
@@ -46,34 +49,50 @@ async function handleImageUpload(file) {
 app.post("/compress-image", upload.single("file"), async (req, res) => {
   try {
     console.log("entered.");
-    const arrayBuffer = req.file;
-    console.log("arrayBuffer: ", arrayBuffer);
+    // const arrayBuffer = req.file;
+    const { buffer } = req.file;
+    console.log("arrayBuffer: ", buffer);
 
-    if (!arrayBuffer) {
-      console.log("buffer is not null");
+    const timestamp = new Date().toISOString();
 
-      const options = {
-        maxSizeMB: 5,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-      console.log("sasa");
-      const compressedFile = await imageCompression(arrayBuffer, options);
-      console.log("asdsad: ", compressedFile);
-      try {
-        console.log("compressing images");
+    const ref = `${timestamp}-sass.jpeg`;
 
-        // smaller than maxSizeMB
-        return res.status(200).json({ message: "finalHtml" });
-      } catch (error) {
-        console.log(error);
-      }
-      return res.status(400).json({ message: "bad request" });
+    await sharp(buffer)
+      .jpeg({ quality: 10 })
+      .toFile("./uploads/" + ref);
+
+    res.status(200).json({ message: "compressed image" });
+
+    if (arrayBuffer != null) {
+      // console.log("buffer is not null");
+      // const options = {
+      //   maxSizeMB: 5,
+      //   maxWidthOrHeight: 1920,
+      //   useWebWorker: true,
+      // };
+      // console.log("sasa");
+      // Almost finished...
+      // imageCompression(arrayBuffer, options).then((x) => {
+      //   console.log("compressedFile: ", x.size);
+      //   try {
+      //     // smaller than maxSizeMB
+      //     return res.status(200).json({ message: "compressed image" });
+      //   } catch (error) {
+      //     console.log(error);
+      //     return res.status(400).json({ message: error });
+      //   }
+      // });
+      // try {
+      //   // smaller than maxSizeMB
+      //   return res.status(200).json({ message: "compressed image" });
+      // } catch (error) {
+      //   console.log(error);
+      //   return res.status(400).json({ message: error });
+      // }
     }
   } catch (error) {
     return res.status(500).json({ message: "unexpected server error" + error });
   }
-  return res.status(200).json({ message: "finalHtml" });
 });
 app.post("/convert-to-html", upload.single("file"), (req, res) => {
   try {
