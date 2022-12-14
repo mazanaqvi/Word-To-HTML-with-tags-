@@ -26,26 +26,7 @@ var finalHtml;
 app.get("/", (req, res) => {
   res.send("Server is Running");
 });
-async function handleImageUpload(file) {
-  const imageFile = file;
 
-  console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
-
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-  };
-  try {
-    const compressedFile = await imageCompression(imageFile, options);
-    // true
-    console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`); // smaller than maxSizeMB
-
-    await uploadToServer(compressedFile); // write your own logic
-  } catch (error) {
-    console.log(error);
-  }
-}
 app.post("/compress-image", upload.single("file"), async (req, res) => {
   try {
     console.log("entered.");
@@ -55,41 +36,13 @@ app.post("/compress-image", upload.single("file"), async (req, res) => {
 
     const timestamp = new Date().toISOString();
 
-    const ref = `${timestamp}-sass.jpeg`;
+    const ref = `${timestamp}-image.jpeg`;
 
-    await sharp(buffer)
+    const compressedImage = await sharp(buffer)
       .jpeg({ quality: 10 })
-      .toFile("./uploads/" + ref);
+      .toBuffer();
 
-    res.status(200).json({ message: "compressed image" });
-
-    if (arrayBuffer != null) {
-      // console.log("buffer is not null");
-      // const options = {
-      //   maxSizeMB: 5,
-      //   maxWidthOrHeight: 1920,
-      //   useWebWorker: true,
-      // };
-      // console.log("sasa");
-      // Almost finished...
-      // imageCompression(arrayBuffer, options).then((x) => {
-      //   console.log("compressedFile: ", x.size);
-      //   try {
-      //     // smaller than maxSizeMB
-      //     return res.status(200).json({ message: "compressed image" });
-      //   } catch (error) {
-      //     console.log(error);
-      //     return res.status(400).json({ message: error });
-      //   }
-      // });
-      // try {
-      //   // smaller than maxSizeMB
-      //   return res.status(200).json({ message: "compressed image" });
-      // } catch (error) {
-      //   console.log(error);
-      //   return res.status(400).json({ message: error });
-      // }
-    }
+    res.status(200).json({ message: compressedImage });
   } catch (error) {
     return res.status(500).json({ message: "unexpected server error" + error });
   }
@@ -154,12 +107,6 @@ app.post("/convert-to-html", upload.single("file"), (req, res) => {
         html = html.replaceAll("<riwayat>", '<p class="riwayat">');
         html = html.replaceAll("</riwayat>", "</p>");
 
-        // // html = html.replaceAll("<urduShair>", '<p class="urduShair">');
-        // // html = html.replaceAll("</urduShair>", "</p>");
-
-        // html = html.replaceAll("<farsiShair>", '<p class="farsiShair">');
-        // html = html.replaceAll("</farsiShair>", "</p>");
-
         html = html.replaceAll(
           "ﷺ",
           " صَلَّی اللہُ عَلَیْہِ وَاٰلِہٖ وَسَلَّمْ "
@@ -169,11 +116,6 @@ app.post("/convert-to-html", upload.single("file"), (req, res) => {
           '<html dir="rtl" lang="ur"><head><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head><body>' +
           html +
           "</body></html>";
-
-        // finalHtml = finalHtml.replaceAll("<title>", '<h1 class="title">');
-        // finalHtml = finalHtml.replaceAll("</title>", "</h1>");
-
-        //fs.writeFileSync(nameHTML, finalHtml, { encoding: "utf8", flag: "w" });
         return res.status(200).json({ message: finalHtml });
       });
   } catch (error) {
