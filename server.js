@@ -29,17 +29,16 @@ app.get("/", (req, res) => {
 
 app.post("/compress-image", upload.single("file"), async (req, res) => {
   try {
-    console.log("entered.");
     // const arrayBuffer = req.file;
     const { buffer } = req.file;
-    console.log("arrayBuffer: ", buffer);
 
     const timestamp = new Date().toISOString();
 
     const ref = `${timestamp}-image.jpeg`;
 
     const compressedImage = await sharp(buffer)
-      .jpeg({ quality: 10 })
+      .jpeg({ quality: 40 })
+      .resize(1000, 1330)
       .toBuffer();
 
     res.status(200).json({ imageBuffer: compressedImage });
@@ -49,10 +48,7 @@ app.post("/compress-image", upload.single("file"), async (req, res) => {
 });
 app.post("/convert-to-html", upload.single("file"), (req, res) => {
   try {
-    console.log("entered.");
-    console.log(req.body);
     const arrayBuffer = req.file;
-    console.log("arrayBuffer: ", arrayBuffer);
 
     if (!arrayBuffer) {
       return res.status(400).json({ message: "bad request" });
