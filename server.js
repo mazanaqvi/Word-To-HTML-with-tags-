@@ -38,12 +38,14 @@ app.post("/compress-image", upload.single("file"), async (req, res) => {
 
     const compressedImage = await sharp(buffer)
       .jpeg({ quality: 40 })
-      .resize(1000, 1330)
+      .resize(500, 665)
       .toBuffer();
 
     res.status(200).json({ imageBuffer: compressedImage });
   } catch (error) {
-    return res.status(500).json({ message: "unexpected server error" + error });
+    return res
+      .status(500)
+      .json({ imageBuffer: "unexpected server error" + error });
   }
 });
 app.post("/convert-to-html", upload.single("file"), (req, res) => {
